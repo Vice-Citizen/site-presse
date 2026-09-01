@@ -340,8 +340,13 @@ if(sessionStorage.getItem("vc_admin_auth")==="1"){
     <div class="sidebar-section">Clients</div>
     <button class="nav-item" onclick="setSection('devis-clients')" id="nav-devis-clients">
       <div class="nav-icon" style="background:rgba(180,68,58,0.15);">📋</div>
-      <div><div class="nav-label">Demandes de devis</div></div>
+      <div><div class="nav-label">Demandes reçues</div></div>
       <span class="nav-count" id="cnt-devis-clients">0</span>
+    </button>
+    <button class="nav-item" onclick="devisPrefill=null;setSection('devis-doc')" id="nav-devis-doc">
+      <div class="nav-icon" style="background:rgba(200,160,60,0.15);">🧾</div>
+      <div><div class="nav-label">Créer un devis</div></div>
+      <span class="nav-count" id="cnt-devis-doc">0</span>
     </button>
     <div class="sidebar-section">Identité</div>
     <button class="nav-item" onclick="setSection('carte-pro')" id="nav-carte-pro">
@@ -645,11 +650,23 @@ const SECTIONS = {
       {id:"citation_auteur",label:"Auteur de la citation",type:"text",placeholder:"ex : Jackson BAY, patrouilleur DIR"},
     ]
   },
+  "devis-doc": { label:"Devis client", icon:"🧾",
+    fields:[
+      {id:"client_nom",label:"Nom du client / organisateur",type:"text",placeholder:"Ex : Événements Vice City",required:true},
+      {id:"client_contact",label:"Contact (Discord)",type:"text",placeholder:"pseudo#0000"},
+      {id:"date_devis",label:"Date",type:"date",required:true},
+      {id:"service",label:"Prestation",type:"select",required:true,
+        options:["Séance photo","Tournage vidéo","Article de presse","Vidéo de présentation","Prestation sur mesure"]},
+      {id:"taux_horaire",label:"Tarif horaire ($)",type:"number",placeholder:"1200",required:true},
+      {id:"heures",label:"Nombre d'heures",type:"number",placeholder:"3",required:true},
+      {id:"notes",label:"Détails / conditions (optionnel)",type:"textarea",full:true,rows:4,placeholder:"Contexte, lieu, conditions particulières…"},
+    ]
+  },
   "carte-pro": { label:"Carte professionnelle", icon:"🪪",
     fields:[
       {id:"nom",label:"Nom",type:"text",placeholder:"LEWIS",required:true},
       {id:"prenom",label:"Prénom",type:"text",placeholder:"Calvin",required:true},
-      {id:"profession",label:"Profession / rôle",type:"text",placeholder:"Directeur de Production",required:true},
+      {id:"profession",label:"Profession / rôle",type:"text",placeholder:"Directeur de la publication",required:true},
       {id:"numero_doc",label:"N° de document",type:"text",placeholder:"76561199022633060",required:true},
       {id:"date_expiration",label:"Date d'expiration",type:"date",required:true},
       {id:"__photoid__",type:"photoid"},
@@ -657,7 +674,7 @@ const SECTIONS = {
   }
 };
 
-let docs=[], currentSection=null;
+let docs=[], currentSection=null, devisPrefill=null;
 
 const SUPABASE_URL = "https://vmtjwwdhbjybazhbwjzk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdGp3d2RoYmp5YmF6aGJ3anprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDE1OTIsImV4cCI6MjEwMzc3NzU5Mn0.xGH8u3grWRc7UcgNbywBebSCEaRP2bliXkJlaQtYK28";
@@ -717,7 +734,8 @@ async function renderDevisPanel(){
             background:${d.statut==='traité'?'rgba(120,200,120,.12);color:#8ED080':'rgba(200,160,60,.14);color:#C8A03C'};">${escHtml(d.statut)}</span>
         </div>
         <p style="font-size:12.5px;color:#B8AE9C;margin-top:10px;line-height:1.6;white-space:pre-wrap;">${escHtml(d.description)}</p>
-        <div style="display:flex;gap:8px;margin-top:12px;">
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+          <button class="btn-ghost btn-sm" onclick='devisPrefill={client_nom:${JSON.stringify(d.nom)},client_contact:${JSON.stringify(d.discord||"")},service:${JSON.stringify(d.service)},notes:${JSON.stringify(d.description||"")}};setSection("devis-doc")'>🧾 Créer un devis</button>
           ${d.statut!=='traité'
             ? `<button class="btn-ghost btn-sm" onclick="updateDevisStatut('${d.id}','traité').then(renderDevisPanel)">Marquer comme traité</button>`
             : `<button class="btn-ghost btn-sm" onclick="updateDevisStatut('${d.id}','nouveau').then(renderDevisPanel)">Remettre en nouveau</button>`}
@@ -734,7 +752,7 @@ function uid(){ return Date.now()+Math.random().toString(36).slice(2,6); }
 function fmtDate(ts){ return new Date(ts).toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric"}); }
 function fmtDateFR(iso){ if(!iso) return "—"; try{ const[y,m,d]=iso.split("-"); return `${d}/${m}/${y}`; }catch(e){ return iso; } }
 function fmtDateLong(iso){ if(!iso) return ""; try{ const[y,m,d]=iso.split("-"); const M=["","JANVIER","FÉVRIER","MARS","AVRIL","MAI","JUIN","JUILLET","AOÛT","SEPTEMBRE","OCTOBRE","NOVEMBRE","DÉCEMBRE"]; return `${parseInt(d)} ${M[parseInt(m)]} ${y}`; }catch(e){ return iso; } }
-function genRef(type){ const p={"courrier-ext":"CE","art-2sujets":"A2S","art-1sujet":"A1S","carte-pro":"ID"}; return `VC-${p[type]||"DOC"}-${new Date().getFullYear().toString().slice(2)}-${(docs.filter(d=>d.type===type).length+1).toString().padStart(3,"0")}`; }
+function genRef(type){ const p={"courrier-ext":"CE","art-2sujets":"A2S","art-1sujet":"A1S","carte-pro":"ID","devis-doc":"DEV"}; return `VC-${p[type]||"DOC"}-${new Date().getFullYear().toString().slice(2)}-${(docs.filter(d=>d.type===type).length+1).toString().padStart(3,"0")}`; }
 function confirmDel(t,m,cb){ document.getElementById("modal-title").textContent=t; document.getElementById("modal-msg").textContent=m; document.getElementById("modal-confirm").onclick=()=>{cb();closeModal();}; document.getElementById("modal").classList.add("open"); }
 function closeModal(){ document.getElementById("modal").classList.remove("open"); }
 function updateStats(){
@@ -745,7 +763,7 @@ function updateStats(){
     <div class="stat-pill"><div class="stat-num">${total}</div><div class="stat-lbl">Documents</div></div>
     <div class="stat-pill"><div class="stat-num" style="color:#7AC870">${month}</div><div class="stat-lbl">Ce mois</div></div>
     <div class="stat-pill"><div class="stat-num" style="color:#C8A03C">${c}</div><div class="stat-lbl">Courriers</div></div>`;
-  ["courrier-ext","art-2sujets","art-1sujet","carte-pro"].forEach(k=>{ const el=document.getElementById("cnt-"+k); if(el) el.textContent=docs.filter(d=>d.type===k).length; });
+  ["courrier-ext","art-2sujets","art-1sujet","carte-pro","devis-doc"].forEach(k=>{ const el=document.getElementById("cnt-"+k); if(el) el.textContent=docs.filter(d=>d.type===k).length; });
 }
 function setSection(s){
   currentSection=s;
@@ -824,6 +842,12 @@ function renderMain(){
   fAct.appendChild(r); fAct.appendChild(s); fAct.appendChild(p);
   formCard.appendChild(fAct);
   panel.innerHTML=""; panel.appendChild(formCard); panel.appendChild(buildHistory()); updateStats();
+  if(currentSection==="devis-doc" && devisPrefill){
+    const pf = devisPrefill; devisPrefill = null;
+    setTimeout(()=>{
+      Object.keys(pf).forEach(k=>{ const el=document.getElementById("f-"+k); if(el && pf[k]) el.value = pf[k]; });
+    },0);
+  }
 }
 function getFormData(){
   const sec=SECTIONS[currentSection];
@@ -836,7 +860,7 @@ function saveDoc(){
   const sec=SECTIONS[currentSection]; const data=getFormData();
   const missing=sec.fields.filter(f=>f.required&&(f.type==="text"||f.type==="textarea")&&!data[f.id]?.trim());
   if(missing.length){ alert("Champs obligatoires : "+missing.map(f=>f.label).join(", ")); return; }
-  const title=data.destinataire||data.titre_1||(data.nom?`${data.prenom||""} ${data.nom}`.trim():"")||"Sans titre";
+  const title=data.destinataire||data.titre_1||data.client_nom||(data.nom?`${data.prenom||""} ${data.nom}`.trim():"")||"Sans titre";
   docs.unshift({id:uid(),ts:Date.now(),type:currentSection,ref:data.ref,title,data});
   save(); renderMain();
 }
@@ -882,7 +906,7 @@ function previewDoc(id){
   let data,type,ref;
   if(id){ const doc=docs.find(d=>d.id===id); if(!doc) return; data=doc.data; type=doc.type; ref=doc.ref; }
   else { data=getFormData(); type=currentSection; ref=data.ref||genRef(currentSection); }
-  const html=type==="courrier-ext"?buildCourrierHTML(data,ref):type==="carte-pro"?buildCartePro(data,ref):buildJournalHTML(data,ref,type);
+  const html=type==="courrier-ext"?buildCourrierHTML(data,ref):type==="carte-pro"?buildCartePro(data,ref):type==="devis-doc"?buildDevisHTML(data,ref):buildJournalHTML(data,ref,type);
   document.getElementById("pdf-title").textContent=ref+" — "+SECTIONS[type].label;
   document.getElementById("pdf-content").innerHTML=html;
   document.getElementById("pdf-overlay").classList.add("open");
@@ -1105,10 +1129,10 @@ function buildCourrierHTML(data, ref){
         <div class="doc-stamp">
           <div class="stamp-line"></div>
           <div class="stamp-org">Vice Citizen</div>
-          <div class="stamp-dept">Dir. de Production</div>
+          <div class="stamp-dept">Dir. de la publication</div>
           <div class="stamp-line"></div>
           <div class="stamp-initials">C.L.</div>
-          <div class="stamp-title">Dir. de Production</div>
+          <div class="stamp-title">Dir. de la publication</div>
           <div class="stamp-line"></div>
         </div>
       </div>
@@ -1117,6 +1141,112 @@ function buildCourrierHTML(data, ref){
   </div>`;
 }
 
+
+
+function buildDevisHTML(data, ref){
+  const today = new Date().toLocaleDateString("fr-FR", {day:"numeric", month:"long", year:"numeric"});
+  const fmtD = iso => { if(!iso) return "—"; try{ const[y,m,d]=iso.split("-"); return `${d}/${m}/${y}`; }catch(e){ return iso; } };
+  const taux = parseFloat(data.taux_horaire)||0;
+  const heures = parseFloat(data.heures)||0;
+  const total = taux*heures;
+  const fmtMoney = n => n.toLocaleString("fr-FR",{maximumFractionDigits:0}) + " $";
+
+  const metaHTML = `
+    <div class="doc-meta-item">
+      <div class="meta-label">Référence</div>
+      <div class="meta-value" style="font-family:'Courier New',monospace;font-size:10px;">${ref}</div>
+    </div>
+    <div class="doc-meta-item">
+      <div class="meta-label">Client</div>
+      <div class="meta-value">${data.client_nom||"—"}</div>
+    </div>
+    <div class="doc-meta-item">
+      <div class="meta-label">Contact</div>
+      <div class="meta-value">${data.client_contact||"—"}</div>
+    </div>
+    <div class="doc-meta-item">
+      <div class="meta-label">Date</div>
+      <div class="meta-value">${fmtD(data.date_devis)}</div>
+    </div>`;
+
+  return `<div class="doc-page">
+
+    <!-- EN-TÊTE -->
+    <div class="doc-header">
+      <div class="doc-logo-wrap">${logoRond(90)}</div>
+      <div style="text-align:center;flex:1;padding:0 20px;">
+        <div class="org-name">Vice Citizen</div>
+        <div class="org-sub">Direction de la publication</div>
+        <div class="org-tagline">La vérité au cœur de Vice City.</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="doc-ref-box">${ref}</div>
+      </div>
+    </div>
+
+    <!-- BANDEAU TITRE -->
+    <div class="doc-type-banner">DEVIS</div>
+
+    <!-- ENCADRÉ MÉTA -->
+    <div class="doc-meta-grid">${metaHTML}</div>
+
+    <!-- TABLEAU DE PRESTATION -->
+    <table style="width:100%;border-collapse:collapse;margin:26px 0 18px;font-family:Georgia,'Times New Roman',serif;font-size:12px;">
+      <thead>
+        <tr style="border-bottom:1.5px solid #1A1510;">
+          <th style="text-align:left;padding:8px 4px;font-family:Arial,Helvetica,sans-serif;font-size:9.5px;
+            font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5A4A28;">Prestation</th>
+          <th style="text-align:right;padding:8px 4px;font-family:Arial,Helvetica,sans-serif;font-size:9.5px;
+            font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5A4A28;">Tarif horaire</th>
+          <th style="text-align:right;padding:8px 4px;font-family:Arial,Helvetica,sans-serif;font-size:9.5px;
+            font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5A4A28;">Heures</th>
+          <th style="text-align:right;padding:8px 4px;font-family:Arial,Helvetica,sans-serif;font-size:9.5px;
+            font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5A4A28;">Sous-total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #D8D0BC;">
+          <td style="padding:12px 4px;">${data.service||"—"}</td>
+          <td style="padding:12px 4px;text-align:right;">${fmtMoney(taux)}</td>
+          <td style="padding:12px 4px;text-align:right;">${heures}</td>
+          <td style="padding:12px 4px;text-align:right;">${fmtMoney(total)}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="padding:14px 4px 4px;text-align:right;font-family:Arial,Helvetica,sans-serif;
+            font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;">Total à régler</td>
+          <td style="padding:14px 4px 4px;text-align:right;font-size:19px;font-weight:700;border-top:1.5px solid #1A1510;">${fmtMoney(total)}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    ${data.notes?.trim() ? `<div class="doc-text" style="margin-top:10px;line-height:1.8;">${data.notes.trim()}</div>` : ""}
+
+    <!-- PIED DE PAGE -->
+    <div class="doc-footer">
+      <div class="doc-footer-sig">
+        <div style="font-size:9px;color:#8A7A5A;font-family:'DM Sans',sans-serif;">Fait à Vice City, le ${today}</div>
+        <div class="doc-signature-line">
+          <div class="sig-name">${SIGNATAIRE}</div>
+          <div class="sig-role">Directeur de la publication — Vice Citizen</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="doc-stamp">
+          <div class="stamp-line"></div>
+          <div class="stamp-org">Vice Citizen</div>
+          <div class="stamp-dept">Dir. de la publication</div>
+          <div class="stamp-line"></div>
+          <div class="stamp-initials">C.L.</div>
+          <div class="stamp-title">Dir. de la publication</div>
+          <div class="stamp-line"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>`;
+}
 
 
 function buildCartePro(data, ref){
