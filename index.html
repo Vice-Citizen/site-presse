@@ -5,76 +5,93 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vice Citizen — Presse, images &amp; annonces de Vice City</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@500&display=swap');
 
 :root{
   --ink:#0B0A08;
-  --ink2:#131009;
+  --ink2:#141108;
   --paper:#F5F0E8;
-  --paper-dim:#EAE2D0;
   --gold:#C8A03C;
+  --gold-soft:#E4C878;
   --gold-dim:#8A7A5A;
   --stamp:#8A2820;
-  --stamp-dim:#B4443A;
+  --stamp-soft:#B4443A;
   --text:#D8D4CD;
   --text-dim:#8A8070;
+  --line:rgba(200,160,60,.18);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);line-height:1.5;}
+body{font-family:'DM Sans',sans-serif;background:var(--ink);color:var(--text);line-height:1.55;
+  -webkit-font-smoothing:antialiased;}
 a{color:inherit;}
-img{max-width:100%;display:block;}
+button{font-family:inherit;cursor:pointer;}
 
-/* ── Texture de fond ─────────────────────────────── */
+/* ── texture de fond ─────────────────────────────── */
 .bg{position:fixed;inset:0;z-index:0;pointer-events:none;}
 .bg::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(ellipse 60% 40% at 10% 0%, rgba(200,160,60,0.08) 0%, transparent 60%),
-  radial-gradient(ellipse 50% 35% at 95% 60%, rgba(138,40,32,0.10) 0%, transparent 55%);}
+  radial-gradient(ellipse 60% 40% at 8% 0%, rgba(200,160,60,0.09) 0%, transparent 60%),
+  radial-gradient(ellipse 50% 35% at 96% 55%, rgba(138,40,32,0.11) 0%, transparent 55%);}
 .bg::after{content:"";position:absolute;inset:0;background-image:
   linear-gradient(rgba(200,160,60,0.025) 1px,transparent 1px),
   linear-gradient(90deg,rgba(200,160,60,0.025) 1px,transparent 1px);
   background-size:52px 52px;}
 
-/* ── Masthead ─────────────────────────────────────── */
-.masthead{position:relative;z-index:1;padding:34px 24px 0;text-align:center;}
-.masthead-topband{display:inline-block;background:var(--ink2);color:var(--gold);
-  font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;
-  padding:5px 16px;border:1px solid rgba(200,160,60,0.25);}
-.masthead-title{font-family:'Playfair Display',serif;font-weight:900;
-  font-size:clamp(40px,9vw,84px);line-height:.95;margin-top:18px;color:#EAE0C8;letter-spacing:.01em;}
-.masthead-title span{color:var(--gold);}
-.masthead-tag{font-family:'Libre Baskerville',serif;font-style:italic;font-size:14px;
-  color:var(--gold-dim);margin-top:10px;letter-spacing:.05em;}
-.masthead-sub{max-width:640px;margin:22px auto 0;border-top:1.5px solid rgba(200,160,60,.4);
-  border-bottom:1.5px solid rgba(200,160,60,.4);padding:8px 0;display:flex;justify-content:space-between;
-  font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  font-weight:700;color:var(--text-dim);}
+/* ── halftone décoratif ──────────────────────────── */
+.halftone{position:absolute;inset:0;opacity:.5;pointer-events:none;
+  background-image:radial-gradient(rgba(200,160,60,.5) 1px, transparent 1.4px);
+  background-size:7px 7px;
+  mask-image:linear-gradient(to bottom, black, transparent);}
 
-/* ── Nav ──────────────────────────────────────────── */
-nav{position:sticky;top:0;z-index:50;margin-top:26px;background:rgba(11,10,8,0.92);
-  backdrop-filter:blur(10px);border-bottom:1px solid rgba(200,160,60,0.18);}
-nav ul{list-style:none;display:flex;justify-content:center;gap:34px;flex-wrap:wrap;
-  padding:13px 20px;max-width:900px;margin:0 auto;}
-nav a{font-size:12px;font-weight:600;letter-spacing:.03em;color:var(--text-dim);
+/* ── masthead ─────────────────────────────────────── */
+.masthead{position:relative;z-index:1;padding:38px 24px 0;text-align:center;overflow:hidden;}
+.masthead-topband{position:relative;display:inline-block;background:var(--ink2);color:var(--gold);
+  font-size:9px;font-weight:700;letter-spacing:.25em;text-transform:uppercase;
+  padding:5px 16px;border:1px solid var(--line);}
+.masthead-title{position:relative;font-family:'Playfair Display',serif;font-weight:900;
+  font-size:clamp(42px,9vw,88px);line-height:.94;margin-top:20px;color:#EAE0C8;letter-spacing:.01em;}
+.masthead-title span{color:var(--gold);}
+.masthead-tag{position:relative;font-family:'Libre Baskerville',serif;font-style:italic;font-size:14px;
+  color:var(--gold-dim);margin-top:10px;letter-spacing:.04em;}
+.masthead-sub{position:relative;max-width:660px;margin:24px auto 0;border-top:1.5px solid rgba(200,160,60,.4);
+  border-bottom:1.5px solid rgba(200,160,60,.4);padding:9px 4px;display:flex;justify-content:space-between;
+  flex-wrap:wrap;gap:8px 18px;font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:700;color:var(--text-dim);}
+
+/* ── skyline décoratif ────────────────────────────── */
+.skyline{position:relative;z-index:1;height:100px;margin-top:30px;}
+.skyline svg{width:100%;height:100%;display:block;}
+
+/* ── nav ──────────────────────────────────────────── */
+nav{position:sticky;top:0;z-index:50;background:rgba(11,10,8,0.93);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.nav-inner{max-width:940px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.nav-links{list-style:none;display:flex;gap:30px;flex-wrap:wrap;}
+.nav-links a{font-size:12px;font-weight:600;letter-spacing:.02em;color:var(--text-dim);
   text-decoration:none;transition:color .15s;}
-nav a:hover{color:var(--gold);}
+.nav-links a:hover{color:var(--gold);}
+.nav-login{background:none;border:1px solid rgba(200,160,60,.4);color:var(--gold);
+  font-size:11px;font-weight:700;padding:7px 16px;border-radius:20px;letter-spacing:.04em;
+  transition:background .15s;}
+.nav-login:hover{background:rgba(200,160,60,.1);}
 
 main{position:relative;z-index:1;}
-section{max-width:900px;margin:0 auto;padding:74px 24px;}
-.section-label{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;color:var(--stamp-dim);
+section{max-width:940px;margin:0 auto;padding:78px 24px;}
+.section-label{font-family:'DM Sans',sans-serif;font-size:10px;font-weight:700;color:var(--stamp-soft);
   letter-spacing:.16em;text-transform:uppercase;margin-bottom:10px;}
-h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(26px,4vw,38px);color:#EAE0C8;
-  max-width:14ch;}
+h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(27px,4vw,40px);color:#EAE0C8;
+  max-width:15ch;}
 
-/* ── Hero ─────────────────────────────────────────── */
-.hero{padding-top:56px;display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:end;}
-.hero h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(30px,4.6vw,46px);
-  line-height:1.1;color:#EAE0C8;}
+/* ── hero ─────────────────────────────────────────── */
+.hero{padding-top:60px;display:grid;grid-template-columns:1.3fr 1fr;gap:50px;align-items:end;}
+.hero h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(31px,4.6vw,48px);
+  line-height:1.08;color:#EAE0C8;}
 .hero h1 em{font-style:normal;color:var(--gold);}
-.hero p{font-family:'Libre Baskerville',serif;font-size:15px;color:var(--text);margin-top:18px;
-  max-width:52ch;line-height:1.75;}
-.hero-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:2px;
+.hero p{font-family:'Libre Baskerville',serif;font-size:15px;color:var(--text);margin-top:20px;
+  max-width:52ch;line-height:1.8;}
+.hero-actions{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:2px;
   font-size:12.5px;font-weight:700;text-decoration:none;border:1px solid transparent;
   font-family:'DM Sans',sans-serif;transition:filter .15s,transform .1s;}
 .btn:active{transform:scale(.98);}
@@ -82,65 +99,110 @@ h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(26px,4vw
 .btn-stamp:hover{filter:brightness(1.12);}
 .btn-outline{border-color:rgba(200,160,60,.4);color:var(--gold);}
 .btn-outline:hover{background:rgba(200,160,60,.08);}
-.hero-byline{border-left:3px solid var(--gold);padding-left:16px;font-family:'Libre Baskerville',serif;
-  font-style:italic;font-size:13px;color:var(--text-dim);align-self:end;}
+.hero-byline{border-left:3px solid var(--gold);padding-left:18px;font-family:'Libre Baskerville',serif;
+  font-style:italic;font-size:13.5px;color:var(--text-dim);align-self:end;line-height:1.7;}
 
-/* ── Services / rubriques (façon petites annonces encadrées) ── */
-.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:26px;}
-.svc{border:2px dashed rgba(200,160,60,0.3);padding:22px 20px;position:relative;}
-.svc-icon{font-size:22px;opacity:.9;}
-.svc h3{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#EAE0C8;
-  margin-top:10px;}
-.svc p{font-size:12.5px;color:var(--text-dim);margin-top:8px;line-height:1.6;}
-.svc-price{margin-top:16px;padding-top:12px;border-top:1px solid rgba(200,160,60,.18);
+/* ── séparateur presse ────────────────────────────── */
+.press-rule{max-width:940px;margin:0 auto;padding:0 24px;}
+.press-rule::before{content:"";display:block;height:3px;background:
+  repeating-linear-gradient(90deg,var(--gold) 0 6px, transparent 6px 12px);opacity:.5;}
+
+/* ── services ─────────────────────────────────────── */
+.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:28px;}
+.svc{border:1px solid var(--line);padding:26px 24px;position:relative;transition:border-color .2s,transform .15s;}
+.svc:hover{border-color:rgba(200,160,60,.4);transform:translateY(-2px);}
+.svc-icon{width:36px;height:36px;color:var(--gold);}
+.svc-icon svg{width:100%;height:100%;}
+.svc h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:#EAE0C8;
+  margin-top:14px;}
+.svc p{font-size:12.5px;color:var(--text-dim);margin-top:9px;line-height:1.65;}
+.svc-price{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);
   display:flex;justify-content:space-between;align-items:baseline;}
-.svc-price .amount{font-family:'DM Sans',sans-serif;font-weight:700;font-size:19px;color:var(--gold);}
-.svc-price .unit{font-size:10px;color:var(--text-dim);}
+.svc-price .amount{font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:var(--gold);}
+.svc-price .unit{font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;}
 
-/* ── Devis (formulaire "petite annonce") ─────────── */
-.devis-wrap{background:rgba(16,14,10,.55);border:1px solid rgba(200,160,60,.16);padding:30px 28px;
-  margin-top:26px;}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+/* ── citation éditoriale ──────────────────────────── */
+.pull-quote{max-width:940px;margin:0 auto;padding:10px 24px 0;}
+.pull-quote blockquote{font-family:'Playfair Display',serif;font-style:italic;font-weight:700;
+  font-size:clamp(19px,2.6vw,26px);color:var(--gold-soft);text-align:center;line-height:1.5;
+  max-width:26ch;margin:0 auto;}
+.pull-quote cite{display:block;margin-top:14px;font-family:'DM Sans',sans-serif;font-style:normal;
+  font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);}
+
+/* ── devis ────────────────────────────────────────── */
+.devis-wrap{background:rgba(20,17,8,.6);border:1px solid var(--line);padding:32px 30px;
+  margin-top:28px;}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:17px;}
 .field label{font-size:10px;font-weight:700;color:var(--gold-dim);text-transform:uppercase;
   letter-spacing:.08em;}
 .field input,.field select,.field textarea{background:rgba(10,9,6,.6);
-  border:1px solid rgba(200,160,60,.18);color:#EAE0C8;font-family:'DM Sans',sans-serif;
-  font-size:13px;padding:10px 12px;border-radius:2px;outline:none;transition:border-color .15s;}
+  border:1px solid var(--line);color:#EAE0C8;font-family:'DM Sans',sans-serif;
+  font-size:13px;padding:11px 13px;border-radius:2px;outline:none;transition:border-color .15s;}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(200,160,60,.5);}
-.field textarea{min-height:100px;resize:vertical;line-height:1.6;}
+.field textarea{min-height:104px;resize:vertical;line-height:1.6;}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-#devis-status{margin-top:14px;font-size:12.5px;padding:10px 12px;border-radius:2px;display:none;}
+#devis-status{margin-top:15px;font-size:12.5px;padding:11px 13px;border-radius:2px;display:none;}
 #devis-status.ok{display:block;background:rgba(80,130,60,0.12);border:1px solid rgba(80,130,60,.3);color:#9AD08A;}
 #devis-status.err{display:block;background:rgba(180,50,40,0.12);border:1px solid rgba(180,50,40,.3);color:#E09A90;}
 
-/* ── Tarif annonces ("carnet d'adresses" de la ville) ── */
-.rate-card{margin-top:26px;border:1px solid rgba(200,160,60,.22);}
-.rate-row{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;
-  border-bottom:1px solid rgba(200,160,60,.14);}
+/* ── tarif annonces ───────────────────────────────── */
+.rate-card{margin-top:28px;border:1px solid var(--line);}
+.rate-row{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 24px;
+  border-bottom:1px solid var(--line);}
 .rate-row:last-child{border-bottom:none;}
-.rate-name{font-family:'Playfair Display',serif;font-size:16px;color:#EAE0C8;}
+.rate-name{font-family:'Playfair Display',serif;font-size:16.5px;color:#EAE0C8;}
 .rate-name small{display:block;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-dim);
-  margin-top:4px;font-weight:400;}
-.rate-amount{font-family:'DM Sans',sans-serif;font-weight:700;font-size:20px;color:var(--gold);
+  margin-top:5px;font-weight:400;}
+.rate-amount{font-family:'DM Sans',sans-serif;font-weight:700;font-size:21px;color:var(--gold);
   white-space:nowrap;}
 .rate-amount .old{font-size:12px;color:var(--text-dim);text-decoration:line-through;
-  font-weight:400;margin-right:8px;}
+  font-weight:400;margin-right:9px;}
 .rate-note{margin-top:16px;font-family:'Libre Baskerville',serif;font-style:italic;font-size:12.5px;
   color:var(--text-dim);}
 
-/* ── Footer ───────────────────────────────────────── */
-footer{border-top:2px solid rgba(200,160,60,.2);margin-top:20px;padding:34px 24px 44px;text-align:center;}
-footer .sig{font-family:'Playfair Display',serif;font-size:15px;color:#EAE0C8;}
-footer .contact{margin-top:8px;font-size:12px;color:var(--text-dim);}
-footer .admin-link{display:inline-block;margin-top:22px;font-size:10.5px;color:rgba(138,122,90,.55);
-  text-decoration:none;}
-footer .admin-link:hover{color:var(--gold-dim);}
+/* ── footer ───────────────────────────────────────── */
+footer{border-top:2px solid var(--line);margin-top:10px;}
+.footer-inner{max-width:940px;margin:0 auto;padding:44px 24px 40px;display:grid;
+  grid-template-columns:1.2fr 1fr 1fr;gap:30px;}
+.footer-brand{font-family:'Playfair Display',serif;font-size:19px;color:#EAE0C8;}
+.footer-brand span{color:var(--gold);}
+.footer-tag{margin-top:8px;font-family:'Libre Baskerville',serif;font-style:italic;font-size:12px;
+  color:var(--text-dim);}
+.footer-col h4{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold-dim);margin-bottom:12px;}
+.footer-col a{display:block;font-size:12.5px;color:var(--text-dim);text-decoration:none;
+  margin-bottom:8px;}
+.footer-col a:hover{color:var(--gold);}
+.footer-bottom{border-top:1px solid var(--line);text-align:center;padding:18px 24px 30px;}
+.footer-bottom .sig{font-size:11.5px;color:var(--text-dim);}
+.footer-bottom .admin-link{display:inline-block;margin-top:12px;font-size:10.5px;
+  color:rgba(138,122,90,.5);text-decoration:none;}
+.footer-bottom .admin-link:hover{color:var(--gold-dim);}
+
+/* ── modale PIN ───────────────────────────────────── */
+.pin-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.pin-overlay.open{display:flex;}
+.pin-card{width:100%;max-width:330px;background:#100E0A;border:1px solid var(--line);
+  padding:30px 28px;text-align:center;}
+.pin-card h3{font-family:'Playfair Display',serif;color:#EAE0C8;font-size:18px;}
+.pin-card p{font-size:12px;color:var(--text-dim);margin-top:6px;}
+.pin-card input{margin-top:18px;width:100%;text-align:center;letter-spacing:.5em;font-size:20px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);color:#EAE0C8;
+  padding:12px;border-radius:2px;font-family:'DM Mono',monospace;outline:none;}
+.pin-card input:focus{border-color:rgba(200,160,60,.5);}
+.pin-card .pin-err{margin-top:11px;font-size:11.5px;color:#E09A90;display:none;}
+.pin-actions{display:flex;gap:10px;margin-top:20px;}
+.pin-actions button{flex:1;padding:11px;border-radius:2px;border:1px solid transparent;
+  font-size:12px;font-weight:700;}
+.pin-cancel{background:rgba(255,255,255,.05);color:var(--text-dim);border-color:rgba(255,255,255,.08)!important;}
 
 @media (max-width:720px){
   .hero{grid-template-columns:1fr;}
   .hero-byline{border-left:none;border-top:2px solid var(--gold);padding-left:0;padding-top:12px;}
   .services-grid{grid-template-columns:1fr;}
   .field-row{grid-template-columns:1fr;}
+  .footer-inner{grid-template-columns:1fr;gap:26px;}
 }
 </style>
 </head>
@@ -148,23 +210,61 @@ footer .admin-link:hover{color:var(--gold-dim);}
 <div class="bg"></div>
 
 <header class="masthead">
+  <div class="halftone"></div>
   <span class="masthead-topband">★ Édition Vice City ★</span>
   <div class="masthead-title">VICE <span>CITIZEN</span></div>
   <div class="masthead-tag">« La vérité au cœur de Vice City »</div>
   <div class="masthead-sub">
     <span>Presse &amp; images</span>
-    <span>Depuis Vice City</span>
-    <span>Direction : C. Lewis</span>
+    <span>Vice City</span>
+    <span>Directeur de la publication : Calvin LEWIS</span>
+  </div>
+  <div class="skyline">
+    <svg viewBox="0 0 1200 130" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="1080" cy="34" r="20" fill="#C8A03C" opacity="0.55"/>
+      <g fill="#141108" stroke="#C8A03C" stroke-opacity="0.22">
+        <rect x="0" y="60" width="46" height="70"/>
+        <rect x="52" y="40" width="30" height="90"/>
+        <rect x="90" y="72" width="54" height="58"/>
+        <rect x="150" y="24" width="34" height="106"/>
+        <rect x="190" y="55" width="40" height="75"/>
+        <rect x="236" y="68" width="26" height="62"/>
+        <rect x="270" y="15" width="38" height="115"/>
+        <rect x="314" y="48" width="50" height="82"/>
+        <rect x="370" y="70" width="30" height="60"/>
+        <rect x="406" y="30" width="42" height="100"/>
+        <rect x="454" y="58" width="34" height="72"/>
+        <rect x="494" y="8" width="30" height="122"/>
+        <rect x="530" y="46" width="56" height="84"/>
+        <rect x="592" y="66" width="28" height="64"/>
+        <rect x="626" y="26" width="38" height="104"/>
+        <rect x="670" y="52" width="44" height="78"/>
+        <rect x="720" y="72" width="26" height="58"/>
+        <rect x="752" y="18" width="36" height="112"/>
+        <rect x="794" y="50" width="48" height="80"/>
+        <rect x="848" y="64" width="30" height="66"/>
+        <rect x="884" y="34" width="40" height="96"/>
+        <rect x="930" y="58" width="34" height="72"/>
+        <rect x="970" y="10" width="30" height="120"/>
+        <rect x="1006" y="46" width="52" height="84"/>
+        <rect x="1064" y="70" width="28" height="60"/>
+        <rect x="1098" y="40" width="36" height="90"/>
+        <rect x="1140" y="62" width="60" height="68"/>
+      </g>
+    </svg>
   </div>
 </header>
 
 <nav>
-  <ul>
-    <li><a href="#services">Nos services</a></li>
-    <li><a href="#devis">Demander un devis</a></li>
-    <li><a href="#annonces">Annonces en ville</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
+  <div class="nav-inner">
+    <ul class="nav-links">
+      <li><a href="#services">Nos services</a></li>
+      <li><a href="#devis">Demander un devis</a></li>
+      <li><a href="#annonces">Annonces</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="nav-login" onclick="openPinModal()">Connexion rédaction</button>
+  </div>
 </nav>
 
 <main>
@@ -181,8 +281,10 @@ footer .admin-link:hover{color:var(--gold-dim);}
         <a href="#services" class="btn btn-outline">Voir les tarifs</a>
       </div>
     </div>
-    <div class="hero-byline">Rédaction ouverte à toute heure.<br>Réponse sous 24h en jeu.</div>
+    <div class="hero-byline">« Chaque commerce, chaque événement<br>de Vice City mérite sa une. »<br>— Rédaction ouverte à toute heure.</div>
   </section>
+
+  <div class="press-rule"></div>
 
   <!-- ═══ SERVICES ═══ -->
   <section id="services">
@@ -191,39 +293,44 @@ footer .admin-link:hover{color:var(--gold-dim);}
     <div class="services-grid">
 
       <div class="svc">
-        <div class="svc-icon">📷</div>
+        <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.6"/></svg></div>
         <h3>Séance photo</h3>
         <p>Portrait, événement, commerce ou véhicule : une séance sur place avec plusieurs clichés retouchés.</p>
-        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">500 $</span></div>
+        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">2 500 $</span></div>
       </div>
 
       <div class="svc">
-        <div class="svc-icon">🎬</div>
+        <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="14" height="12" rx="1.4"/><path d="M16.5 10.2 21 7.5v9L16.5 13.8"/></svg></div>
         <h3>Tournage vidéo</h3>
         <p>Captation d'un événement, d'une intervention ou d'un moment fort, montée en une courte vidéo.</p>
-        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">1 500 $</span></div>
+        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">7 500 $</span></div>
       </div>
 
       <div class="svc">
-        <div class="svc-icon">📰</div>
+        <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M15 3v4h4"/><path d="M8 12h8M8 15.5h8M8 8.5h4"/></svg></div>
         <h3>Article de presse</h3>
         <p>Rédaction d'un article officiel Vice Citizen sur votre actualité, avec photos incluses.</p>
-        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">800 $</span></div>
+        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">4 000 $</span></div>
       </div>
 
       <div class="svc">
-        <div class="svc-icon">🎥</div>
+        <div class="svc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="1.4"/><path d="M10.2 9.2v5.6l4.6-2.8Z" fill="currentColor" stroke="none"/></svg></div>
         <h3>Vidéo de présentation</h3>
         <p>Vidéo soignée pour présenter une entreprise, un commerce ou une organisation à toute la ville.</p>
-        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">2 000 $</span></div>
+        <div class="svc-price"><span class="unit">à partir de</span><span class="amount">10 000 $</span></div>
       </div>
 
     </div>
   </section>
 
+  <div class="pull-quote">
+    <blockquote>« Ce qui n'est pas raconté n'existe qu'à moitié. »</blockquote>
+    <cite>— La rédaction de Vice Citizen</cite>
+  </div>
+
   <!-- ═══ DEVIS ═══ -->
   <section id="devis">
-    <div class="section-label">Petite annonce</div>
+    <div class="section-label">Nous contacter</div>
     <h2>Déposer une demande de devis</h2>
     <div class="devis-wrap">
       <form id="devis-form">
@@ -233,8 +340,8 @@ footer .admin-link:hover{color:var(--gold-dim);}
             <input id="f-nom" name="nom" type="text" required placeholder="Ex : Garage Sunset">
           </div>
           <div class="field">
-            <label for="f-jeu">Nom en jeu</label>
-            <input id="f-jeu" name="nom_jeu" type="text" placeholder="Votre personnage">
+            <label for="f-jeu">Votre nom</label>
+            <input id="f-jeu" name="nom_jeu" type="text" placeholder="Nom et prénom">
           </div>
         </div>
         <div class="field-row">
@@ -267,30 +374,86 @@ footer .admin-link:hover{color:var(--gold-dim);}
   <!-- ═══ ANNONCES ═══ -->
   <section id="annonces">
     <div class="section-label">Petites annonces</div>
-    <h2>Tarifs des annonces en ville</h2>
+    <h2>Tarifs des annonces</h2>
     <div class="rate-card">
       <div class="rate-row">
         <div class="rate-name">Une annonce<small>Diffusion unique en ville</small></div>
-        <div class="rate-amount">300 $</div>
+        <div class="rate-amount">1 500 $</div>
       </div>
       <div class="rate-row">
         <div class="rate-name">Pack de 3 annonces<small>Diffusion en ville, à espacer comme vous le souhaitez</small></div>
-        <div class="rate-amount"><span class="old">900 $</span>750 $</div>
+        <div class="rate-amount"><span class="old">4 500 $</span>3 750 $</div>
       </div>
     </div>
-    <p class="rate-note">L'achat et la diffusion des annonces se font directement en jeu, en ville, auprès
+    <p class="rate-note">L'achat et la diffusion des annonces se font directement en ville, auprès
     de la rédaction Vice Citizen.</p>
   </section>
 
 </main>
 
 <footer id="contact">
-  <div class="sig">Vice Citizen</div>
-  <div class="contact">Direction : Calvin Lewis · Rédaction ouverte à toute la ville</div>
-  <a class="admin-link" href="admin.html">Espace rédaction →</a>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">VICE <span>CITIZEN</span></div>
+      <div class="footer-tag">« La vérité au cœur de Vice City »</div>
+    </div>
+    <div class="footer-col">
+      <h4>Navigation</h4>
+      <a href="#services">Nos services</a>
+      <a href="#devis">Demander un devis</a>
+      <a href="#annonces">Annonces</a>
+    </div>
+    <div class="footer-col">
+      <h4>Rédaction</h4>
+      <a href="#" onclick="return false;">Directeur de la publication : Calvin LEWIS</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="sig">Vice Citizen — Rédaction ouverte à toute la ville</div>
+    <a class="admin-link" href="#" onclick="openPinModal();return false;">Espace rédaction →</a>
+  </div>
 </footer>
 
+<!-- ═══ MODALE PIN ═══ -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-card">
+    <h3>Espace rédaction</h3>
+    <p>Entrez le code PIN pour accéder à l'outil de documents.</p>
+    <input type="password" id="pin-input" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••">
+    <div class="pin-err" id="pin-err">Code incorrect. Réessayez.</div>
+    <div class="pin-actions">
+      <button class="pin-cancel" onclick="closePinModal()">Annuler</button>
+      <button class="btn-stamp" style="background:var(--stamp);color:#F5E8E4;" onclick="checkPin()">Valider</button>
+    </div>
+  </div>
+</div>
+
 <script>
+const ADMIN_PIN = "4871"; // ← change ce code, il doit être identique dans admin.html
+
+function openPinModal(){
+  document.getElementById("pin-overlay").classList.add("open");
+  document.getElementById("pin-err").style.display="none";
+  const input=document.getElementById("pin-input");
+  input.value="";
+  setTimeout(()=>input.focus(),80);
+}
+function closePinModal(){
+  document.getElementById("pin-overlay").classList.remove("open");
+}
+function checkPin(){
+  const val = document.getElementById("pin-input").value.trim();
+  if(val === ADMIN_PIN){
+    sessionStorage.setItem("vc_admin_auth","1");
+    window.location.href = "admin.html";
+  } else {
+    document.getElementById("pin-err").style.display="block";
+    document.getElementById("pin-input").value="";
+    document.getElementById("pin-input").focus();
+  }
+}
+document.getElementById("pin-input").addEventListener("keydown", e=>{ if(e.key==="Enter") checkPin(); });
+
 const SUPABASE_URL = "https://vmtjwwdhbjybazhbwjzk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdGp3d2RoYmp5YmF6aGJ3anprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDE1OTIsImV4cCI6MjEwMzc3NzU5Mn0.xGH8u3grWRc7UcgNbywBebSCEaRP2bliXkJlaQtYK28";
 
@@ -318,13 +481,17 @@ document.getElementById("devis-form").addEventListener("submit", async (e) => {
       body: JSON.stringify(data)
     });
 
-    if (!res.ok) throw new Error(await res.text());
+    if (!res.ok) {
+      let detail = "";
+      try { detail = (await res.json()).message || ""; } catch(_) {}
+      throw new Error(detail || `Erreur ${res.status}`);
+    }
 
     statusEl.textContent = "Votre demande a bien été envoyée. La rédaction vous recontactera.";
     statusEl.className = "ok";
     form.reset();
   } catch (err) {
-    statusEl.textContent = "Une erreur est survenue. Réessayez ou contactez-nous directement sur Discord.";
+    statusEl.textContent = "Erreur lors de l'envoi (" + err.message + "). Contactez-nous directement sur Discord.";
     statusEl.className = "err";
     console.error(err);
   } finally {

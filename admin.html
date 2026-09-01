@@ -240,6 +240,57 @@ button:active{transform:scale(0.97);}
 </style>
 </head>
 <body>
+
+<!-- ═══ VERROU PIN ═══ -->
+<style>
+#pin-gate{position:fixed;inset:0;z-index:9999;background:#0A0B0D;display:flex;align-items:center;justify-content:center;padding:20px;}
+#pin-gate.hidden{display:none;}
+.pin-box{width:100%;max-width:340px;text-align:center;}
+.pin-box .pin-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:30px;color:#EAE0C8;}
+.pin-box .pin-logo span{color:#C8A03C;}
+.pin-box .pin-tag{font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8A7A5A;margin-top:6px;}
+.pin-box .pin-title{margin-top:26px;font-size:13px;color:#9A9080;}
+.pin-box input{margin-top:16px;width:100%;text-align:center;letter-spacing:.5em;font-size:22px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(200,160,60,0.25);color:#EAE0C8;
+  padding:14px;border-radius:7px;font-family:'DM Mono',monospace;outline:none;}
+.pin-box input:focus{border-color:rgba(200,160,60,0.55);}
+.pin-box button{margin-top:16px;width:100%;padding:12px;border-radius:7px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#C8A03C,#A07828);color:#0A0B0D;font-weight:700;font-size:13px;
+  font-family:'DM Sans',sans-serif;}
+.pin-box .pin-err{margin-top:12px;font-size:11.5px;color:#D87060;display:none;}
+.pin-box .pin-back{display:inline-block;margin-top:22px;font-size:11px;color:#5A4A28;text-decoration:none;}
+.pin-box .pin-back:hover{color:#8A7A5A;}
+</style>
+<div id="pin-gate">
+  <div class="pin-box">
+    <div class="pin-logo">VICE <span>CITIZEN</span></div>
+    <div class="pin-tag">Espace rédaction</div>
+    <div class="pin-title">Entrez le code PIN pour accéder à l'outil</div>
+    <input type="password" id="pin-input-gate" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="••••">
+    <button onclick="checkAdminPin()">Déverrouiller</button>
+    <div class="pin-err" id="pin-err-gate">Code incorrect. Réessayez.</div>
+    <a class="pin-back" href="index.html">← Retour au site</a>
+  </div>
+</div>
+<script>
+const ADMIN_PIN = "4871"; // ← change ce code, il doit être identique dans index.html
+function checkAdminPin(){
+  const val = document.getElementById("pin-input-gate").value.trim();
+  if(val === ADMIN_PIN){
+    sessionStorage.setItem("vc_admin_auth","1");
+    document.getElementById("pin-gate").classList.add("hidden");
+  } else {
+    document.getElementById("pin-err-gate").style.display="block";
+    document.getElementById("pin-input-gate").value="";
+    document.getElementById("pin-input-gate").focus();
+  }
+}
+document.getElementById("pin-input-gate")?.addEventListener("keydown", e=>{ if(e.key==="Enter") checkAdminPin(); });
+if(sessionStorage.getItem("vc_admin_auth")==="1"){
+  document.getElementById("pin-gate").classList.add("hidden");
+}
+</script>
+
 <div class="bg"><div class="bg-lines"></div></div>
 <div class="topbar">
   <div class="topbar-left">
@@ -248,8 +299,11 @@ button:active{transform:scale(0.97);}
     <div class="topbar-divider"></div>
     <div class="status-chip"><span class="status-dot"></span>Sauvegarde locale active</div>
   </div>
-  <div style="font-size:10px;color:#5A4A28;text-align:right;line-height:1.4;">
-    <div style="color:#8A7A5A;font-weight:600;">Directeur de Production</div><div>Calvin LEWIS</div>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="font-size:10px;color:#5A4A28;text-align:right;line-height:1.4;">
+      <div style="color:#8A7A5A;font-weight:600;">Directeur de la publication</div><div>Calvin LEWIS</div>
+    </div>
+    <a href="index.html" class="btn btn-ghost btn-sm" style="text-decoration:none;">🏠 Accueil</a>
   </div>
 </div>
 <div class="hero" style="position:relative;z-index:1;">
@@ -942,7 +996,7 @@ function buildCourrierHTML(data, ref){
       <div class="doc-logo-wrap">${logoRond(90)}</div>
       <div style="text-align:center;flex:1;padding:0 20px;">
         <div class="org-name">Vice Citizen</div>
-        <div class="org-sub">Direction de Production</div>
+        <div class="org-sub">Direction de la publication</div>
         <div class="org-tagline">La vérité au cœur de Vice City.</div>
       </div>
       <div style="text-align:right;flex-shrink:0;">
@@ -967,7 +1021,7 @@ function buildCourrierHTML(data, ref){
         <div style="font-size:9px;color:#8A7A5A;font-family:'DM Sans',sans-serif;">Fait à Vice City, le ${today}</div>
         <div class="doc-signature-line">
           <div class="sig-name">${SIGNATAIRE}</div>
-          <div class="sig-role">Directeur de Production — Vice Citizen</div>
+          <div class="sig-role">Directeur de la publication — Vice Citizen</div>
         </div>
       </div>
       <div style="text-align:right;">
