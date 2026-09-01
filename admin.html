@@ -337,6 +337,12 @@ if(sessionStorage.getItem("vc_admin_auth")==="1"){
       <div><div class="nav-label">1 sujet, 2 sous-titres</div><div class="nav-sublabel">Développement en 2 parties</div></div>
       <span class="nav-count" id="cnt-art-1sujet">0</span>
     </button>
+    <div class="sidebar-section">Clients</div>
+    <button class="nav-item" onclick="setSection('devis-clients')" id="nav-devis-clients">
+      <div class="nav-icon" style="background:rgba(180,68,58,0.15);">📋</div>
+      <div><div class="nav-label">Demandes de devis</div></div>
+      <span class="nav-count" id="cnt-devis-clients">0</span>
+    </button>
     <div class="sidebar-section">Identité</div>
     <button class="nav-item" onclick="setSection('carte-pro')" id="nav-carte-pro">
       <div class="nav-icon" style="background:rgba(80,170,110,0.15);">🪪</div>
@@ -652,6 +658,76 @@ const SECTIONS = {
 };
 
 let docs=[], currentSection=null;
+
+const SUPABASE_URL = "https://vmtjwwdhbjybazhbwjzk.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtdGp3d2RoYmp5YmF6aGJ3anprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgyMDE1OTIsImV4cCI6MjEwMzc3NzU5Mn0.xGH8u3grWRc7UcgNbywBebSCEaRP2bliXkJlaQtYK28";
+const sbHeaders = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json" };
+
+async function fetchDevis(){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/devis?select=*&order=created_at.desc`, { headers: sbHeaders });
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+async function updateDevisStatut(id, statut){
+  await fetch(`${SUPABASE_URL}/rest/v1/devis?id=eq.${id}`, {
+    method:"PATCH", headers:{...sbHeaders,"Prefer":"return=minimal"}, body: JSON.stringify({statut})
+  });
+}
+async function deleteDevis(id){
+  await fetch(`${SUPABASE_URL}/rest/v1/devis?id=eq.${id}`, { method:"DELETE", headers: sbHeaders });
+}
+async function refreshDevisCount(){
+  try{
+    const list = await fetchDevis();
+    const nb = list.filter(d=>d.statut==="nouveau").length;
+    const el = document.getElementById("cnt-devis-clients");
+    if(el) el.textContent = nb;
+  }catch(e){ /* silencieux : compteur non critique */ }
+}
+async function renderDevisPanel(){
+  const panel = document.getElementById("main-panel");
+  panel.innerHTML = `<div class="empty-main"><div style="font-size:32px;opacity:.25">📋</div><div>Chargement des demandes…</div></div>`;
+  let list;
+  try{ list = await fetchDevis(); }
+  catch(e){
+    panel.innerHTML = `<div class="form-card"><div class="form-body">
+      <p style="color:#E09A90;font-size:13px;">Impossible de charger les devis.</p>
+      <p style="color:#8A7A5A;font-size:11.5px;margin-top:8px;">Détail : ${escHtml(e.message)}</p>
+      <p style="color:#8A7A5A;font-size:11.5px;margin-top:8px;">Vérifie que le script SQL a bien été exécuté dans Supabase (table + policies).</p>
+    </div></div>`;
+    return;
+  }
+  document.getElementById("cnt-devis-clients").textContent = list.filter(d=>d.statut==="nouveau").length;
+  if(list.length===0){
+    panel.innerHTML = `<div class="empty-main"><div style="font-size:32px;opacity:.25">📋</div><div>Aucune demande de devis pour le moment.</div></div>`;
+    return;
+  }
+  const dfmt = iso => new Date(iso).toLocaleString("fr-FR",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});
+  panel.innerHTML = `<div class="form-card"><div class="form-card-hdr"><span style="font-size:15px">📋</span>
+    <div class="form-card-title">Demandes de devis (${list.length})</div></div>
+    <div class="form-body" style="display:flex;flex-direction:column;gap:12px;">
+    ${list.map(d=>`
+      <div style="border:1px solid rgba(200,160,60,0.16);border-radius:8px;padding:16px 18px;${d.statut==='traité'?'opacity:.55;':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-family:'Playfair Display',serif;font-size:15px;color:#EAE0C8;">${escHtml(d.nom)} ${d.nom_jeu?'— '+escHtml(d.nom_jeu):''}</div>
+            <div style="font-size:11px;color:#8A7A5A;margin-top:3px;">${escHtml(d.service)} · ${dfmt(d.created_at)}${d.discord?' · Discord : '+escHtml(d.discord):''}</div>
+          </div>
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:4px 10px;border-radius:20px;
+            background:${d.statut==='traité'?'rgba(120,200,120,.12);color:#8ED080':'rgba(200,160,60,.14);color:#C8A03C'};">${escHtml(d.statut)}</span>
+        </div>
+        <p style="font-size:12.5px;color:#B8AE9C;margin-top:10px;line-height:1.6;white-space:pre-wrap;">${escHtml(d.description)}</p>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          ${d.statut!=='traité'
+            ? `<button class="btn-ghost btn-sm" onclick="updateDevisStatut('${d.id}','traité').then(renderDevisPanel)">Marquer comme traité</button>`
+            : `<button class="btn-ghost btn-sm" onclick="updateDevisStatut('${d.id}','nouveau').then(renderDevisPanel)">Remettre en nouveau</button>`}
+          <button class="btn-ghost btn-sm" style="color:#D87060;" onclick="if(confirm('Supprimer cette demande ?')) deleteDevis('${d.id}').then(renderDevisPanel)">Supprimer</button>
+        </div>
+      </div>`).join("")}
+    </div></div>`;
+}
+function escHtml(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
 function save(){ try{ localStorage.setItem("vc_docs_v5",JSON.stringify(docs)); }catch(e){} }
 function load(){ try{ const d=localStorage.getItem("vc_docs_v5"); if(d) docs=JSON.parse(d); }catch(e){ docs=[]; } }
 function uid(){ return Date.now()+Math.random().toString(36).slice(2,6); }
@@ -676,6 +752,7 @@ function setSection(s){
   photos={p1:newPhoto(),p2:newPhoto(),p3:newPhoto(),idphoto:newPhoto()};
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   document.getElementById("nav-"+s).classList.add("active");
+  if(s==="devis-clients"){ renderDevisPanel(); return; }
   renderMain();
 }
 function renderMain(){
@@ -1205,6 +1282,7 @@ function buildJournalHTML(data, ref, type){
 load();
 document.getElementById("main-panel").innerHTML=`<div class="empty-main"><div style="font-size:32px;opacity:0.25">📄</div><div>Sélectionnez un type de document.</div></div>`;
 updateStats();
+refreshDevisCount();
 </script>
 </body>
 </html>
