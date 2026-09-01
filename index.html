@@ -195,10 +195,6 @@ h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(27px,4vw
 .edition-lightbox.open{display:flex;}
 .edition-lightbox-frame{position:relative;width:97vw;height:96vh;display:flex;align-items:center;justify-content:center;}
 .edition-lightbox-frame img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:default;}
-.edition-lightbox-caption{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);
-  background:rgba(4,3,2,.72);backdrop-filter:blur(4px);padding:8px 18px;border-radius:3px;
-  font-family:'Playfair Display',serif;font-size:13.5px;color:#EAE0C8;text-align:center;max-width:88vw;
-  pointer-events:none;}
 .edition-lightbox-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
   color:#EAE0C8;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;z-index:2;}
 .edition-lightbox-close:hover{background:rgba(255,255,255,0.18);}
@@ -485,7 +481,6 @@ footer{border-top:2px solid var(--line);margin-top:10px;}
   <button class="edition-lightbox-close" onclick="closeEditionLightbox()">✕</button>
   <div class="edition-lightbox-frame">
     <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
-    <div id="lb-caption" class="edition-lightbox-caption"></div>
   </div>
 </div>
 
@@ -528,7 +523,6 @@ let editionsData = [];
 function openEditionLightbox(idx){
   const a = editionsData[idx]; if(!a || !a.image_data) return;
   document.getElementById("lb-img").src = a.image_data;
-  document.getElementById("lb-caption").textContent = a.titre;
   document.getElementById("edition-lightbox").classList.add("open");
   document.body.style.overflow = "hidden";
 }
