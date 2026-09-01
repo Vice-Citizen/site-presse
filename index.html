@@ -189,6 +189,16 @@ h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(27px,4vw
 .edition-row .titre{color:var(--text);flex:1;padding:0 14px;}
 .edition-row .date{color:var(--text-dim);white-space:nowrap;}
 
+/* ── visionneuse plein écran ──────────────────────── */
+.edition-lightbox{position:fixed;inset:0;z-index:600;background:rgba(4,3,2,0.94);backdrop-filter:blur(6px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;cursor:zoom-out;}
+.edition-lightbox.open{display:flex;}
+.edition-lightbox img{max-width:92vw;max-height:82vh;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:default;}
+.edition-lightbox-caption{margin-top:16px;font-family:'Playfair Display',serif;font-size:15px;color:#EAE0C8;text-align:center;max-width:80vw;}
+.edition-lightbox-close{position:absolute;top:22px;right:26px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);
+  color:#EAE0C8;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;}
+.edition-lightbox-close:hover{background:rgba(255,255,255,0.16);}
+
 /* ── footer ───────────────────────────────────────── */
 footer{border-top:2px solid var(--line);margin-top:10px;}
 .footer-inner{max-width:940px;margin:0 auto;padding:44px 24px 40px;display:grid;
@@ -443,6 +453,13 @@ footer{border-top:2px solid var(--line);margin-top:10px;}
 </footer>
 
 <!-- ═══ ESPACE RÉDACTION (intégré) ═══ -->
+<!-- ═══ VISIONNEUSE ÉDITIONS ═══ -->
+<div id="edition-lightbox" class="edition-lightbox" onclick="closeEditionLightbox()">
+  <button class="edition-lightbox-close" onclick="closeEditionLightbox()">✕</button>
+  <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
+  <div id="lb-caption" class="edition-lightbox-caption"></div>
+</div>
+
 <div id="admin-wrap" style="display:none;position:fixed;inset:0;z-index:500;background:#0A0B0D;">
   <iframe id="admin-frame" style="width:100%;height:100%;border:none;display:block;"></iframe>
 </div>
@@ -478,11 +495,25 @@ loadTarifs();
 
 // ── Éditions publiées ────────────────────────────────────────
 function escHtmlPub(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+let editionsData = [];
+function openEditionLightbox(idx){
+  const a = editionsData[idx]; if(!a || !a.image_data) return;
+  document.getElementById("lb-img").src = a.image_data;
+  document.getElementById("lb-caption").textContent = a.titre;
+  document.getElementById("edition-lightbox").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeEditionLightbox(){
+  document.getElementById("edition-lightbox").classList.remove("open");
+  document.body.style.overflow = "";
+}
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeEditionLightbox(); });
 async function loadEditions(){
   const wrap = document.getElementById("editions-wrap");
   try{
     const { data, error } = await sb.from("articles").select("*").order("created_at",{ascending:false}).limit(3);
     if(error) throw error;
+    editionsData = data || [];
     if(!data || !data.length){
       wrap.innerHTML = `<p style="font-family:'Libre Baskerville',serif;font-style:italic;color:var(--text-dim);font-size:13px;">Aucune édition publiée pour l'instant.</p>`;
       return;
@@ -492,17 +523,17 @@ async function loadEditions(){
     const rest = data.slice(1);
     wrap.innerHTML = `
       <div class="edition-latest">
-        ${latest.image_data ? `<img src="${latest.image_data}" alt="${escHtmlPub(latest.titre)}" class="edition-latest-img">` : ""}
+        ${latest.image_data ? `<img src="${latest.image_data}" alt="${escHtmlPub(latest.titre)}" class="edition-latest-img" onclick="openEditionLightbox(0)" style="cursor:zoom-in;">` : ""}
         <div class="edition-latest-body">
           <div>
             <div class="edition-latest-tag">Dernière édition</div>
             <div class="edition-latest-title">${escHtmlPub(latest.titre)}</div>
           </div>
-          <div class="edition-latest-ref">${escHtmlPub(latest.ref)} · ${dfmt(latest.created_at)}</div>
+          <div class="edition-latest-ref">${escHtmlPub(latest.ref)} · ${dfmt(latest.created_at)}${latest.image_data?' · <a href="#" onclick="openEditionLightbox(0);return false;" style="color:var(--gold);">voir en grand ⤢</a>':''}</div>
         </div>
       </div>
-      ${rest.length ? `<div class="edition-list">${rest.map(a=>`
-        <div class="edition-row">
+      ${rest.length ? `<div class="edition-list">${rest.map((a,i)=>`
+        <div class="edition-row" ${a.image_data?`onclick="openEditionLightbox(${i+1})" style="cursor:zoom-in;"`:""}>
           ${a.image_data ? `<img src="${a.image_data}" alt="" class="edition-thumb">` : ""}
           <span class="ref">${escHtmlPub(a.ref)}</span>
           <span class="titre">${escHtmlPub(a.titre)}</span>
