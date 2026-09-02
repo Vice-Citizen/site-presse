@@ -416,7 +416,7 @@ footer{border-top:2px solid var(--line);margin-top:10px;}
           <div class="field">
             <label for="f-jeu">Votre nom (Prénom NOM)</label>
             <input id="f-jeu" name="nom_jeu" type="text" required placeholder="Ex : Jean DUPONT"
-              pattern="^\S+(\s+\S+)+$" title="Merci d'indiquer votre prénom suivi de votre nom (ex : Jean DUPONT).">
+              pattern="^\S+(\s+\S+)*\s+[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ][A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ\-]+$" title="Merci d'indiquer votre prénom suivi de votre NOM en majuscules (ex : Jean DUPONT).">
           </div>
         </div>
         <div class="field-row">
@@ -811,7 +811,7 @@ document.getElementById("devis-form").addEventListener("submit", async (e) => {
   btn.disabled = true;
   btn.textContent = "Envoi en cours…";
   statusEl.className = "";
-  statusEl.style.display = "none";
+  statusEl.removeAttribute("style");
 
   try {
     const { error } = await sb.from("devis").insert(data);
