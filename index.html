@@ -748,6 +748,14 @@ async function loadEditions(){
 }
 loadEditions();
 
+// Rafraîchit automatiquement (sans dépendre uniquement du retour depuis
+// l'espace rédaction) : toutes les 45 secondes, et dès qu'on revient sur
+// cet onglet après l'avoir quitté un moment.
+setInterval(()=>{ loadTarifs(); loadEditions(); }, 45000);
+document.addEventListener("visibilitychange", ()=>{
+  if(document.visibilityState === "visible"){ loadTarifs(); loadEditions(); }
+});
+
 // ── Espace rédaction : ouvre l'outil dans un cadre intégré (même fichier) ──
 let adminLoaded = false;
 function openAdmin(){
