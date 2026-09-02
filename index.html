@@ -191,9 +191,9 @@ h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(27px,4vw
 
 /* ── visionneuse plein écran ──────────────────────── */
 .edition-lightbox{position:fixed;inset:0;z-index:600;background:rgba(4,3,2,0.96);backdrop-filter:blur(6px);
-  display:none;align-items:center;justify-content:center;padding:12px;}
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px;}
 .edition-lightbox.open{display:flex;}
-.edition-lightbox-frame{position:relative;width:97vw;height:96vh;display:flex;align-items:center;justify-content:center;
+.edition-lightbox-frame{position:relative;width:97vw;height:86vh;display:flex;align-items:center;justify-content:center;
   overflow:hidden;touch-action:none;}
 .edition-lightbox-frame img{max-width:none;max-height:none;object-fit:contain;
   box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:zoom-in;user-select:none;-webkit-user-select:none;
@@ -203,7 +203,7 @@ h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(27px,4vw
 .edition-lightbox-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
   color:#EAE0C8;width:38px;height:38px;border-radius:50%;font-size:16px;cursor:pointer;z-index:2;}
 .edition-lightbox-close:hover{background:rgba(255,255,255,0.18);}
-.edition-lightbox-zoombar{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:2;
+.edition-lightbox-zoombar{flex-shrink:0;z-index:2;
   display:flex;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);
   border-radius:30px;padding:6px;backdrop-filter:blur(6px);}
 .edition-lightbox-zoombar button{width:38px;height:38px;border-radius:50%;background:transparent;border:none;
@@ -255,7 +255,7 @@ footer{border-top:2px solid var(--line);margin-top:10px;}
   .edition-row .titre{flex-basis:100%;order:3;padding:0;}
   .edition-latest-body{flex-direction:column;align-items:flex-start;}
   .skyline{height:60px;}
-  .edition-lightbox-frame{width:98vw;height:92vh;}
+  .edition-lightbox-frame{width:98vw;height:80vh;}
   .edition-lightbox-close{top:8px;right:8px;}
 }
 @media (max-width:420px){
@@ -593,13 +593,17 @@ function lbComputeFit(){
 
 function openEditionLightbox(idx){
   const a = editionsData[idx]; if(!a || !a.image_data) return;
+  document.getElementById("edition-lightbox").classList.add("open");
+  document.body.style.overflow = "hidden";
   const img = document.getElementById("lb-img");
   img.style.transform = "none";
   img.src = a.image_data;
-  const ready = () => { lbComputeFit(); };
+  // requestAnimationFrame laisse le temps au navigateur d'afficher réellement
+  // le cadre avant de mesurer sa taille — sinon, pour une image déjà vue
+  // (donc déjà "complete"), le calcul se faisait pendant que le cadre était
+  // encore invisible (taille nulle), et l'image disparaissait entièrement.
+  const ready = () => requestAnimationFrame(lbComputeFit);
   if(img.complete && img.naturalWidth){ ready(); } else { img.onload = ready; }
-  document.getElementById("edition-lightbox").classList.add("open");
-  document.body.style.overflow = "hidden";
   const hint = document.getElementById("lb-hint");
   hint.style.opacity = "1";
   setTimeout(()=>{ hint.style.opacity = "0"; }, 3200);
